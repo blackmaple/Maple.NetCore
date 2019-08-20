@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29123.88
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maple.NetCore", "Maple.NetCore.csproj", "{D3EFA9CE-F56C-479B-A304-F276B29FEA10}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3EFA9CE-F56C-479B-A304-F276B29FEA10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3EFA9CE-F56C-479B-A304-F276B29FEA10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3EFA9CE-F56C-479B-A304-F276B29FEA10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3EFA9CE-F56C-479B-A304-F276B29FEA10}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0A8DC46C-C97A-40AA-BC9D-1058744D9300}
+	EndGlobalSection
+EndGlobal
