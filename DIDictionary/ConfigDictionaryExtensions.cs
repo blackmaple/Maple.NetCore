@@ -16,32 +16,32 @@ namespace Maple.NetCore
         public CMapleSystemConfigDictionary(int capacity) : base(capacity, StringComparer.OrdinalIgnoreCase)
         {
         }
-        public CMapleSystemConfigDictionary() : base(StringComparer.OrdinalIgnoreCase)
+        public CMapleSystemConfigDictionary() : this(1024)
         {
         }
     }
 
-    /// <summary>
-    /// 依赖注入
-    /// </summary>
-    [CDISingleton(typeof(IConfigureOptions<CMapleSystemConfigDictionary>))]
-    public class CSystemConfigDictionary_DIConfigureOptions : CDIConfigureOptions<CMapleSystemConfigDictionary>
-    {
-        public CSystemConfigDictionary_DIConfigureOptions(IConfiguration config) : base(config.GetSection(nameof(CMapleSystemConfigDictionary)))
-        {
-        }
-    }
+    ///// <summary>
+    ///// 依赖注入
+    ///// </summary>
+    //[CDISingleton(typeof(IConfigureOptions<CMapleSystemConfigDictionary>))]
+    //public class CSystemConfigDictionary_DIConfigureOptions : CDIConfigureOptions<CMapleSystemConfigDictionary>
+    //{
+    //    public CSystemConfigDictionary_DIConfigureOptions(IConfiguration config) : base(config.GetSection(nameof(CMapleSystemConfigDictionary)))
+    //    {
+    //    }
+    //}
 
-    /// <summary>
-    /// 依赖注入 自动更新
-    /// </summary>
-    [CDISingleton(typeof(IOptionsChangeTokenSource<CMapleSystemConfigDictionary>))]
-    public class CSystemConfigDictionary_DIOptionsChangeTokenSource : CDIOptionsChangeTokenSource<CMapleSystemConfigDictionary>
-    {
-        public CSystemConfigDictionary_DIOptionsChangeTokenSource(IConfiguration config) : base(config.GetSection(nameof(CMapleSystemConfigDictionary)))
-        {
-        }
-    }
+    ///// <summary>
+    ///// 依赖注入 自动更新
+    ///// </summary>
+    //[CDISingleton(typeof(IOptionsChangeTokenSource<CMapleSystemConfigDictionary>))]
+    //public class CSystemConfigDictionary_DIOptionsChangeTokenSource : CDIOptionsChangeTokenSource<CMapleSystemConfigDictionary>
+    //{
+    //    public CSystemConfigDictionary_DIOptionsChangeTokenSource(IConfiguration config) : base(config.GetSection(nameof(CMapleSystemConfigDictionary)))
+    //    {
+    //    }
+    //}
 
     /// <summary>
     /// 扩展

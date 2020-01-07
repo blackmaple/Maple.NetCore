@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Maple.NetCore
 {
@@ -38,6 +41,162 @@ namespace Maple.NetCore
             return obj;
         }
 
+        public static string ToBase64(this byte[] buffer)
+        {
+            return Convert.ToBase64String(buffer);
+        }
+
+        public static string ToBase64Url(this byte[] buffer)
+        {
+            return Base64UrlTextEncoder.Encode(buffer);
+        }
+
+        public static byte[] FromBase64Url(this string str)
+        {
+            return Base64UrlTextEncoder.Decode(str);
+        }
+
+        public static string AESEncrypt(this string input, string key)
+        {
+            var buffer = Encoding.UTF8.GetBytes(key);
+            var encode = EncryptStringToBytes_Aes(input, buffer);
+            return encode.ToBase64Url();
+        }
+
+        static byte[] EncryptStringToBytes_Aes(string plainText, byte[] keyBuffer)
+        {
+            // Check arguments.
+            if (plainText == null || plainText.Length <= 0)
+                throw new ArgumentNullException("plainText");
+            if (keyBuffer == null || keyBuffer.Length <= 0)
+                throw new ArgumentNullException("Key");
+
+            byte[] encrypted;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Mode = CipherMode.ECB;
+                aesAlg.Padding = PaddingMode.PKCS7;
+
+                // Create an encryptor to perform the stream transform.
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(keyBuffer, null);
+
+                // Create the streams used for encryption.
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt, Encoding.UTF8))
+                        {
+                            //Write all data to the stream.
+                            swEncrypt.Write(plainText);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
+            }
+
+            // Return the encrypted bytes from the memory stream.
+            return encrypted;
+
+        }
+
+        public static string AESDecrypt(this string input, string key)
+        {
+            var encode = input.FromBase64Url();
+            var buffer = Encoding.UTF8.GetBytes(key);
+            return DecryptStringFromBytes_Aes(encode, buffer);
+        }
+
+        static string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] keyBuffer)
+        {
+            // Check arguments.
+            if (cipherText == null || cipherText.Length <= 0)
+                throw new ArgumentNullException("cipherText");
+            if (keyBuffer == null || keyBuffer.Length <= 0)
+                throw new ArgumentNullException("Key");
+
+
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext = null;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Mode = CipherMode.ECB;
+                aesAlg.Padding = PaddingMode.PKCS7;
+
+
+                // Create a decryptor to perform the stream transform.
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(keyBuffer, null);
+
+                // Create the streams used for decryption.
+                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt, Encoding.UTF8))
+                        {
+
+                            // Read the decrypted bytes from the decrypting stream
+                            // and place them in a string.
+                            plaintext = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+
+            }
+
+            return plaintext;
+
+        }
+
+        public static string ToXml<T>(this T obj)
+        {
+            using (var ms = new MemoryStream(1024 * 4))
+            {
+                var settings = new XmlWriterSettings
+                {
+                    Encoding = Encoding.UTF8,
+                    OmitXmlDeclaration = false,
+                    Indent = true,
+                    NewLineHandling = NewLineHandling.Entitize,
+                    NewLineOnAttributes = true
+                };
+                using (var xmlWriter = XmlWriter.Create(ms, settings))
+                {
+                    var xmlNameSpace = new XmlSerializerNamespaces();
+                    xmlNameSpace.Add(string.Empty, string.Empty);
+
+                    var xmlSerializer = new XmlSerializer(typeof(T));
+                    xmlSerializer.Serialize(xmlWriter, obj, xmlNameSpace);
+                }
+                var xml = Encoding.UTF8.GetString(ms.ToArray());
+                return xml;
+            }
+        }
+
+
+        public static T FromXml<T>(this string xml)
+        {
+            var buffer = Encoding.UTF8.GetBytes(xml);
+            using (var ms = new MemoryStream(buffer))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                if (serializer.Deserialize(ms) is T xmlData)
+                {
+                    return xmlData;
+                }
+            }
+            return default;
+        }
+
+
+
         /// <summary>
         /// 获取1970-01-01至dateTime的毫秒数
         /// </summary>
@@ -56,7 +215,7 @@ namespace Maple.NetCore
         /// <summary>
         /// 根据时间戳timestamp（单位毫秒）计算日期
         /// </summary>
-        public static  DateTime FromUnixTicks(this long timestamp)
+        public static DateTime FromUnixTicks(this long timestamp)
         {
             DateTime dt1970 = new DateTime(1970, 1, 1);
             long t = dt1970.Ticks + timestamp * 10000;
