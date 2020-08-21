@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Quartz;
 using Quartz.Impl;
+using Quartz.Impl.Matchers;
 using Quartz.Spi;
 using Scrutor;
 using System;
@@ -34,6 +35,7 @@ namespace Maple.NetCore
             var factory = new StdSchedulerFactory(nameValue);
             this.Scheduler = factory.GetScheduler().Result;
             this.Scheduler.JobFactory = new CQuartzJobFactory(serviceProvider);
+            this.Scheduler.ListenerManager.AddJobListener(new CQuartzJobListener(), GroupMatcher<JobKey>.AnyGroup());
             this.ApplicationLifetime = lifetime;
 
         }
@@ -86,7 +88,7 @@ namespace Maple.NetCore
                             .WithIdentity($@"Job:{jobDetail.Key.FullName}")
                             .Build();
                         var trigger = TriggerBuilder.Create()
-                            .WithIdentity($@"Trigger:{jobDetail.Key.FullName}")
+                            .WithIdentity($@"Trigger:{jobDetail.Key.FullName}", $@"Group:{jobDetail.Key.FullName}")
                             .WithCronSchedule(jobType.CronExpression)
                              .Build();
                         this.Scheduler.ScheduleJob(job, trigger);

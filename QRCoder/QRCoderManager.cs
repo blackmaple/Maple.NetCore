@@ -1,5 +1,5 @@
 ﻿using QRCoder;
-using System.DrawingCore;
+using System.Drawing;
 
 namespace Maple.NetCore
 {

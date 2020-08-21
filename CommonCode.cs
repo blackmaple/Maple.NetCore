@@ -13,33 +13,12 @@ namespace Maple.NetCore
 {
     public static class CCommonCode
     {
-        private static JsonSerializerSettings JsonSettings { get; }
 
         static CCommonCode()
         {
-
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            JsonSettings = new JsonSerializerSettings()
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                DateFormatString = "yyyy.MM.dd HH:mm:ss",
-            };
         }
 
-        public static string ToJson(this object obj)
-        {
-            var json = JsonConvert.SerializeObject(obj, JsonSettings);
-            return json;
-        }
-
-        public static T FromJson<T>(this string json)
-        {
-            var obj = JsonConvert.DeserializeObject<T>(json, JsonSettings);
-            return obj;
-        }
 
         public static string ToBase64(this byte[] buffer)
         {
