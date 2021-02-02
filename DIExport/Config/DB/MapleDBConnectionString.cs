@@ -6,6 +6,7 @@ namespace Maple.NetCore
 {
     public class CMapleDBConnectionString
     {
+
         public string ConnectionString { set; get; }
 
 

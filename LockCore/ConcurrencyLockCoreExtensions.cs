@@ -29,6 +29,7 @@ namespace Maple.NetCore
             var obj = memoryCache.GetOrCreate(realKeyName, p =>
             {
                 p.SetSlidingExpiration(TimeSpan.FromSeconds(seconds));
+               
                 return new AsyncLock();
             });
             return obj;

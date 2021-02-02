@@ -134,14 +134,15 @@ namespace Maple.NetCore
 
         }
 
-        public static string ToXml<T>(this T obj)
+        public static string ToXml<T>(this T obj,bool omitxmldeclaration = false)
         {
             using (var ms = new MemoryStream(1024 * 4))
             {
                 var settings = new XmlWriterSettings
                 {
+                  //  NamespaceHandling = NamespaceHandling.OmitDuplicates
                     Encoding = Encoding.UTF8,
-                    OmitXmlDeclaration = false,
+                    OmitXmlDeclaration = omitxmldeclaration,
                     Indent = true,
                     NewLineHandling = NewLineHandling.Entitize,
                     NewLineOnAttributes = true
@@ -157,6 +158,24 @@ namespace Maple.NetCore
                 var xml = Encoding.UTF8.GetString(ms.ToArray());
                 return xml;
             }
+        }
+
+        public static string ToXml2<T>(this T obj)
+        {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                using StringWriter writer = new StringWriter();
+                serializer.Serialize(writer, obj);
+                string xml = writer.ToString();
+                return xml;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
 
 
@@ -354,6 +373,30 @@ namespace Maple.NetCore
             return result;
         }
 
+
+        public static string Md5(this string inputValue, int code)
+        {
+            using (var md5 = MD5.Create())
+            {
+                var data = md5.ComputeHash(Encoding.UTF8.GetBytes(inputValue));
+                StringBuilder builder = new StringBuilder();
+                if (code == 32)
+                {
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        builder.Append(data[i].ToString("x2"));
+                    }
+                }
+                else if (code == 16)
+                {
+                    for (int i = 4; i < 12; i++)
+                    {
+                        builder.Append(data[i].ToString("x2"));
+                    }
+                }
+                return builder.ToString();
+            }
+        }
 
     }
 }

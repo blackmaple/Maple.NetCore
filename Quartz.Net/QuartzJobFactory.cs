@@ -12,6 +12,7 @@ namespace Maple.NetCore
         IServiceProvider ServiceProvider { get; }
         public CQuartzJobFactory(IServiceProvider serviceProvider)
         {
+            
             this.ServiceProvider = serviceProvider;
         }
         public override IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
